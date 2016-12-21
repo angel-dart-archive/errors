@@ -21,7 +21,8 @@ class ErrorHandler extends AngelPlugin {
 
       if (result == true) {
         return await oldHandler(e, req, res);
-      } else return result;
+      } else
+        return result;
     });
 
     app.fatalErrorStream.listen((error) async {
@@ -52,7 +53,7 @@ class ErrorHandler extends AngelPlugin {
 
   RequestMiddleware throwError({int status: 404}) {
     return (req, ResponseContext res) async {
-      res.status(status);
+      res.statusCode = status;
       return true;
     };
   }
