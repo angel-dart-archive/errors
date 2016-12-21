@@ -4,8 +4,14 @@ import 'package:angel_framework/src/http/fatal_error.dart';
 
 typedef FatalErrorHandler(AngelFatalError e);
 
+/// Convenient error handling plugin for Angel application.
 class ErrorHandler extends AngelPlugin {
+  /// Called on fatal errors, which hopefully are rare.
   FatalErrorHandler fatalErrorHandler;
+
+  /// Response to request based on their outgoing status code.
+  ///
+  /// [AngelHttpException] instances will be available as `req.error`.
   final Map<int, RequestHandler> handlers = {};
 
   ErrorHandler({Map<int, RequestHandler> handlers: const {}}) {
@@ -17,7 +23,7 @@ class ErrorHandler extends AngelPlugin {
     final oldHandler = app.errorHandler;
 
     app.onError((e, req, res) async {
-      final result = await middleware()(req, res);
+      final result = await middleware()(req..properties['error'] = e, res);
 
       if (result == true) {
         return await oldHandler(e, req, res);
@@ -32,13 +38,14 @@ class ErrorHandler extends AngelPlugin {
     });
   }
 
+  /// Handles a request based on its outgoing status code.
   RequestMiddleware middleware({int defaultStatus: 500}) {
     return (RequestContext req, ResponseContext res) async {
-      int key = handlers.containsKey(res.io.statusCode)
-          ? res.io.statusCode
+      int key = handlers.containsKey(res.statusCode)
+          ? res.statusCode
           : handlers.containsKey(defaultStatus) ? defaultStatus : null;
 
-      if (key == null || res.io.statusCode == 200)
+      if (key == null || res.statusCode == 200)
         return true;
       else {
         final result = await handlers[key](req, res);
@@ -51,6 +58,7 @@ class ErrorHandler extends AngelPlugin {
     };
   }
 
+  /// Sets a response's status code.
   RequestMiddleware throwError({int status: 404}) {
     return (req, ResponseContext res) async {
       res.statusCode = status;
