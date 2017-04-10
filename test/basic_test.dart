@@ -23,7 +23,7 @@ main() {
       ..delete('/bar', errorHandler.throwError(status: 405))
       ..after.add(errorHandler.middleware(defaultStatus: 404));
 
-    client = await connectTo(app, saveSession: false);
+    client = await connectTo(app);
   });
 
   tearDown(() async {

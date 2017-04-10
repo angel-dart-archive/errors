@@ -22,14 +22,14 @@ class ErrorHandler extends AngelPlugin {
   Future call(Angel app) async {
     final oldHandler = app.errorHandler;
 
-    app.onError((e, req, res) async {
+    app.errorHandler = (e, req, res) async {
       final result = await middleware()(req..properties['error'] = e, res);
 
       if (result == true) {
         return await oldHandler(e, req, res);
       } else
         return result;
-    });
+    };
 
     app.fatalErrorStream.listen((error) async {
       if (fatalErrorHandler != null) {
