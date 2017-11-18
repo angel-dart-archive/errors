@@ -1,3 +1,9 @@
+/// Angel's built-in error handling support is now robust enough that this library is no logner required.
+///
+/// https://github.com/angel-dart/angel/wiki/Error-Handling
+@deprecated
+library angel_errors;
+
 import 'dart:async';
 import 'package:angel_framework/angel_framework.dart';
 import 'package:angel_framework/src/http/fatal_error.dart';
